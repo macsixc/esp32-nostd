@@ -1,7 +1,6 @@
 #![no_std]
 #![no_main]
 #![feature(type_alias_impl_trait)]
-#![feature(async_fn_in_trait)]
 
 extern crate alloc;
 use core::{mem::MaybeUninit, str::from_utf8};
@@ -11,7 +10,7 @@ use embassy_time::{Timer, Duration};
 use embedded_svc::wifi::{Configuration, ClientConfiguration, Wifi};
 use esp_backtrace as _;
 use esp_println::println;
-use hal::{clock::ClockControl, peripherals::Peripherals, prelude::*, Delay, IO, timer::TimerGroup, embassy, gpio::{Output, PushPull, Gpio4, Gpio3}};
+use hal::{clock::ClockControl, peripherals::Peripherals, prelude::*, Delay, IO, timer::TimerGroup, embassy, gpio::{Output, PushPull, Gpio1, Gpio0}};
 
 use esp_wifi::{initialize, EspWifiInitFor, wifi::{WifiMode, WifiController, WifiState, WifiEvent, WifiDevice}};
 
@@ -54,7 +53,7 @@ fn init_heap() {
 }
 
 #[embassy_executor::task]
-async fn blink_green(mut pin: Gpio4<Output<PushPull>>) {
+async fn blink_green(mut pin: Gpio1<Output<PushPull>>) {
     loop {
         pin.toggle().unwrap();
         // delay.delay_ms(500u32);
@@ -63,7 +62,7 @@ async fn blink_green(mut pin: Gpio4<Output<PushPull>>) {
 }
 
 #[embassy_executor::task]
-async fn blink_red(mut pin: Gpio3<Output<PushPull>>) {
+async fn blink_red(mut pin: Gpio0<Output<PushPull>>) {
     loop {
         pin.toggle().unwrap();
         // delay.delay_ms(500u32);
@@ -243,8 +242,8 @@ fn main() -> ! {
     println!("Hello world!");
 
     let io = IO::new(peripherals.GPIO,peripherals.IO_MUX);
-    let pin3 = io.pins.gpio3.into_push_pull_output();
-    let pin4 = io.pins.gpio4.into_push_pull_output();
+    let pin3 = io.pins.gpio0.into_push_pull_output();
+    let pin4 = io.pins.gpio1.into_push_pull_output();
 
     let executor = make_static!(Executor::new());
     
